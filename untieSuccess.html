@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>解绑成功</title>
+    <script src="assets/libs/jquery/jquery.min.js"></script>
+    <script src="assets/js/flexible_css.js"></script>
+    <script src="assets/js/flexible.js"></script>
+    <!-- <script src="assets/js/common.js"></script> -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="untie-success" id="untie-success">
+        <div class="untie-success-content">
+            <img src="./assets/img/ico-success.png" alt="">
+            <p>解绑成功</p>
+        </div>
+        <button class="untie-success-btn">
+            绑定设备
+        </button>
+    </div>
+</body>
+
+</html>
+<script>
+        $('.untie-success-btn').on('click',function(){
+            window.location.href = "scanSuccess.html";
+        })
+        /*$.ajax({
+            type: "post",
+            url: "",
+            data: {},
+            success: function (result) {
+                wx.config({
+                    debug: false,
+                    appId: result.appId,
+                    timestamp: "" + result.timestamp,
+                    nonceStr: result.noncestr,
+                    signature: result.signature,
+                    jsApiList: ['checkJsApi', 'scanQRCode']
+                });
+            }
+        })
+    
+        wx.error(function (res) {
+            alert("出错了：" + res.errMsg);
+        });
+    
+        wx.ready(function () {
+            wx.checkJsApi({
+                jsApiList: ['scanQRCode'],
+                success: function (res) {
+    
+                }
+            });
+            document.querySelector('.untie-success-btn').onclick = function () {
+                
+                wx.scanQRCode({
+                    needResult: 1, 
+                    scanType: ["qrCode"], 
+                    success: function (res) {
+                        var result = res.resultStr; 
+                        
+                        window.location.href = result;
+                    }
+                });
+            };
+    
+        });*/
+    </script>

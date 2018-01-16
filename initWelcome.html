@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>欢迎词</title>
+    <script src="assets/libs/jquery/jquery.min.js"></script>
+    <script src="assets/js/flexible_css.js"></script>
+    <script src="assets/js/flexible.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <!-- <script src="assets/js/common.js"></script> -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="init-welcome" id="init-welcome">
+        <div class="init-welcome-content">
+            <img src="./assets/img/ico-bind.png" alt="">
+            <p>当前未设置欢迎词</p>
+        </div>
+        <button class="init-welcome-btn">设置欢迎词</button>
+    </div>
+    <div class="init-welcome-model">
+        <div class="init-welcome-gif">
+            <img src="./assets/img/ly.gif" alt="">
+        </div>
+        <p>按住录音,最多60秒</p>
+        <button class="init-welcome-model-btn">保存</button>
+    </div>
+</body>
+
+</html>
+<script>
+    $(document).ready(function () {
+
+        var $resetBtn = $('.init-welcome-btn');
+
+        var $model = $('.init-welcome-model');
+        $model.on('click', function () {
+            $(this).hide();
+
+        })
+        $resetBtn.on('click', function () {
+            $model.show();
+        });
+
+        wx.config({
+            debug: true,
+            appId: '',
+            timestamp: '',
+            nonceStr: '',
+            signature: '',
+            jsApiList: []
+        });
+
+        wx.ready(function () {
+            wx.onVoicePlayEnd({
+                success: function (res) {
+                    stopWave();
+                }
+            });
+
+        });
+        wx.error(function (res) {
+
+        });
+        $('.init-welcome-gif').on('touchstart', function (event) {
+            event.preventDefault();
+            console.log('up')
+            START = new Date().getTime();
+
+            recordTimer = setTimeout(function () {
+                wx.startRecord({
+                    success: function () {
+                        localStorage.rainAllowRecord = 'true';
+                    },
+                    cancel: function () {
+                        alert('用户拒绝授权录音');
+                    }
+                });
+            }, 300);
+        });
+        //松手结束录音
+        $('.init-welcome-gif').on('touchend', function (event) {
+            event.preventDefault();
+            console.log('down');
+            END = new Date().getTime();
+        });
+        $('.init-welcome-model-btn').on('click', function (event) {
+            event.stopPropagation();
+            alert(1);
+            if ((END - START) < 300) {
+                END = 0;
+                START = 0;
+                //小于300ms，不录音
+                clearTimeout(recordTimer);
+            } else {
+                wx.stopRecord({
+                    success: function (res) {
+                        voice.localId = res.localId;
+                        uploadVoice();
+                        
+                    },
+                    fail: function (res) {
+                        alert(JSON.stringify(res));
+                    }
+                });
+            }
+        })
+
+        //上传录音
+        function uploadVoice() {
+            wx.uploadVoice({
+                localId: voice.localId, // 需要上传的音频的本地ID，由stopRecord接口获得
+                isShowProgressTips: 1, // 默认为1，显示进度提示
+                success: function (res) {
+                    //把录音在微信服务器上的id（res.serverId）发送到自己的服务器供下载。
+                    $.ajax({
+                        url: '',
+                        type: 'post',
+                        data: JSON.stringify(res),
+                        dataType: "json",
+                        success: function (data) {
+                            alert('文件已经保存到服务器');
+                            window.location.href = 'haveWelcome.html';
+                        },
+                        error: function (xhr, errorType, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        }
+
+
+
+
+    })
+</script>

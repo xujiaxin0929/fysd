@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>联系人详情</title>
+    <script src="assets/libs/jquery/jquery.min.js"></script>
+    <script src="assets/js/flexible_css.js"></script>
+    <script src="assets/js/flexible.js"></script>
+    <!-- <script src="assets/js/common.js"></script> -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="contact-detail" id="contact-detail">
+        <div class="contact-detail-box">
+            <ul>
+                <li class="clearfix">
+                    <img src="./assets/img/ico-contacts-1.png" alt="">
+                    <p>姓名</p>
+                    <input type="text" placeholder="输入您的姓名" value="宋先生" class="contacts_name">
+                </li>
+                <li class="clearfix">
+                    <img src="./assets/img/ico-contacts-2.png" alt="">
+                    <p>手机号</p>
+                    <input type="text" placeholder="填写手机号码" value="17600188345" class="contacts_phone">
+                </li>
+                <li class="clearfix">
+                    <img src="./assets/img/ico-contacts-3.png" alt="">
+                    <p>备注</p>
+                    <input type="text" placeholder="请输入备注" value="积木网">
+                </li>
+            </ul>
+
+        </div>
+        <div class="contact-detail-btn contact-detail-preservation">
+            <button>编辑联系人</button>
+        </div>
+        <div class="contact-detail-btn contact-detail-cancle">
+            <button>话机拨号</button>
+        </div>
+    </div>
+    <div class="common-footer-fourth" id="common-footer-fourth">
+        <div class="common-tabbar common_tabbar_now clearfix ">
+            <a href="phoneBook.html">
+                <img src="assets/img/ico-foot-blue-1.png" alt="">
+                <span>电话本</span>
+            </a>
+        </div>
+        <div class="common-tabbar  clearfix">
+            <a href="callRecord.html">
+                <img src="assets/img/ico-foot-2.png" alt="">
+                <span>通话记录</span>
+            </a>
+        </div>
+        <div class="common-tabbar clearfix">
+            <a href="voiceMessage.html">
+                <img src="assets/img/ico-foot-3.png" alt="">
+                <span>语音留言</span>
+            </a>
+        </div>
+        <div class="common-tabbar clearfix">
+            <a href="callRec.html">
+                <img src="assets/img/ico-foot-4.png" alt="">
+                <span>通话录音</span>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    $(document).ready(function () {
+        const $qxlink = $('.contact-detail-cancle button');
+        const $return = $('.contact-detail-preservation button');
+        $qxlink.on('click', function () {
+            window.location.href = 'phoneDial.html';
+        });
+        $return.on('click', function () {
+            let obtainNam = $('.contacts_name').val();
+            let obtainNum = $('.contacts_phone').val();
+            rValue(obtainNam, obtainNum);
+        })
+
+        /*$.fn.extend({
+
+            obtainVal: function () {
+                return this.on('click', function () {
+                    alert(1);
+                    let obtainValNam = $('.contacts_name').val();
+                    let obtainValNum = $('.contacts_phone').val();
+                    checkMobile(obtainVal);
+                    checkStr(obtainVal);
+                })
+            }
+        })*/
+        function rValue(str, num) {
+            let sValue = checkStr(str);
+            let nValue = checkNum(num);
+            if (!nValue || !sValue) {
+                return false
+            } else {
+                alert('姓名:' + str + '+电话:' + num);
+                window.location.href = 'phoneBook.html';
+            }
+        }
+        function checkStr(str) {
+            let re1 = new RegExp("^[\u4E00-\u9FA5\uf900-\ufa2d·s]{2,20}$");
+
+            if (!re1.test(str)) {
+                alert("请输入正确的姓名");
+                return false;
+            } else {
+                return str;
+            }
+
+        }
+        function checkNum(num) {
+            var isPhone = /^([0-9]{3,4}-)?[0-9]{7,8}$/;
+            var isMob = /^((\+?86)|(\+86))?(13[012356789][0-9]{8}|15[012356789][0-9]{8}|18[02356789][0-9]{8}|147[0-9]{8}|1349[0-9]{7})$/;
+            if (isMob.test(num) || isPhone.test(num)) {
+                return num;
+            } else {
+                alert('请输入正确的手机号');
+                return false;
+
+            }
+        }
+    })
+
+
+
+</script>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>欢迎词</title>
+    <script src="assets/libs/jquery/jquery.min.js"></script>
+    <script src="assets/js/flexible_css.js"></script>
+    <script src="assets/js/flexible.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <!-- <script src="assets/js/common.js"></script> -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <div class="have-welcome" id="have-welcome">
+        <div class="have-welcome-content">
+            <ul>
+                <li class="clearfix">
+                    <div class="have-welcome-content-video">
+                        <p>欢迎词</p>
+                        <div class="voice clearfix">
+                            <div class="gif">
+                                <img id="images" src="./assets/img/ico-micro.png" alt="" onclick="">
+                                <audio id='audio' src="./assets/video/ceshi.mp3" hidden="true"></audio>
+                            </div>
+                            <div class="right">
+                                <div class="small-triangle"></div>
+                                <div class="click-audio clearfix">
+                                    <img src="./assets/img/ico-micro.png" alt="">
+                                    <span>点击播放</span>
+                                </div>
+                                <div class="audio-time">
+                                    <span>16'</span>
+                                </div>
+                                <div id="touchline" class="speed">
+                                    <div class="circle">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="have-welcome-btn-box">
+            <button class="have-welcome-btn have-welcome-reset-btn">重新录制</button>
+            <button class="have-welcome-btn have-welcome-remove-btn">删除欢迎词</button>
+        </div>
+    </div>
+    <div class="have-welcome-model">
+        <div class="have-welcome-gif">
+            <img src="./assets/img/ly.gif" alt="">
+        </div>
+        <p>按住录音,最多60秒</p>
+        <button class="have-welcome-model-btn">保存</button>
+    </div>
+</body>
+
+</html>
+<script>  
+    $(document).ready(function () {
+
+        var audio = document.getElementById("audio");
+
+        var isTouch = false;
+
+        var lineStart = $("#touchline").offset().left;
+        var lineWidth = $("#touchline").width();
+        let eventTester = function (e) {
+            audio.addEventListener(e, function () {
+
+                $(".click-audio").on('click', function () {
+                    $('.click-audio span').css('color', '#fff');
+                    if (audio.paused) {
+                        Play();
+                    } else {
+                        Pause();
+                    }
+                })
+            });
+        }
+        eventTester("canplay");
+        //监听音频播放完毕事件  
+        audio.addEventListener('ended', function () {
+
+            $(".circle").css("width", 0);
+        }, false);
+
+        function Play() {
+            audio.play();
+            TimeSpan();
+        }
+
+        function Pause() {
+            audio.pause();
+
+        }
+
+        function TimeSpan() {
+
+            setInterval(function () {
+                var currentTime = audio.currentTime;
+                var timeAll = audio.duration;
+                var ProcessNow = (currentTime / timeAll) * 100 + '%';
+                $(".circle").css("width", ProcessNow);
+                var timeAllFm = parseInt(TimeAll());
+                var timecurrent = parseInt(audio.currentTime);
+                var timeReduce = timeAllFm - timecurrent;
+                $('.audio-time > span').html(timeReduce + " ' ");
+                $('.small-triangle').css('border-right-color', '#54da3f');
+                //触发条件停止循环，然后将时间和进度条初始化  
+                if (currentTime >= timeAll) {
+                    $('.audio-time > span').html(timeAllFm + " ' ");
+                    $(".circle").css("width", 0);
+                    $('.small-triangle').css('border-right-color', '#f5f5f5');
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+        function TimeAll() {
+            return audio.duration;
+        }
+        //手势监听事件touchline  
+        var touchline = document.getElementById("touchline");
+        touchline.addEventListener('touchstart', function (evt) {
+            if (audio.pause || audio.ended) {
+                Play();
+            }
+            var touch = evt.touches[0];
+            x = parseInt(touch.pageX);
+            if (x < lineStart) {
+                x = lineStart;
+            }
+            var scale = (x - lineStart) / lineWidth;
+            audio.currentTime = scale * audio.duration;
+        }, false);
+
+
+
+    })  
+</script>
+<script>
+    $(document).ready(function () {
+
+        var $resetBtn = $('.have-welcome-reset-btn');
+
+        var $model = $('.have-welcome-model');
+        $model.on('click', function () {
+            $(this).hide();
+
+        })
+        $resetBtn.on('click', function () {
+            $model.show();
+        });
+        
+        wx.config({
+            debug: true,
+            appId: '',
+            timestamp: '',
+            nonceStr: '',
+            signature: '',
+            jsApiList: []
+        });
+
+        wx.ready(function () {
+            wx.onVoicePlayEnd({
+                success: function (res) {
+                    stopWave();
+                }
+            });
+
+        });
+        wx.error(function (res) {
+            
+        });
+        $('.have-welcome-gif').on('touchstart', function (event) {
+            event.preventDefault();
+            console.log('up')
+            START = new Date().getTime();
+
+            recordTimer = setTimeout(function () {
+                wx.startRecord({
+                    success: function () {
+                        localStorage.rainAllowRecord = 'true';
+                    },
+                    cancel: function () {
+                        alert('用户拒绝授权录音');
+                    }
+                });
+            }, 300);
+        });
+        //松手结束录音
+        $('.have-welcome-gif').on('touchend', function (event) {
+            event.preventDefault();
+            console.log('down');
+            END = new Date().getTime();
+        });
+        $('.have-welcome-model-btn').on('click', function (event) {
+            event.stopPropagation();
+            alert(1);
+            if ((END - START) < 300) {
+                END = 0;
+                START = 0;
+                //小于300ms，不录音
+                clearTimeout(recordTimer);
+            } else {
+                wx.stopRecord({
+                    success: function (res) {
+                        voice.localId = res.localId;
+                        uploadVoice();
+                        
+                    },
+                    fail: function (res) {
+                        alert(JSON.stringify(res));
+                    }
+                });
+            }
+        })
+
+        //上传录音
+        function uploadVoice() {
+            wx.uploadVoice({
+                localId: voice.localId, // 需要上传的音频的本地ID，由stopRecord接口获得
+                isShowProgressTips: 1, // 默认为1，显示进度提示
+                success: function (res) {
+                    //把录音在微信服务器上的id（res.serverId）发送到自己的服务器供下载。
+                    $.ajax({
+                        url: '',
+                        type: 'post',
+                        data: JSON.stringify(res),
+                        dataType: "json",
+                        success: function (data) {
+                            alert('文件已经保存到服务器');
+                            window.location.href = 'haveWelcome.html';
+                        },
+                        error: function (xhr, errorType, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        }
+
+
+
+
+    })
+</script>
